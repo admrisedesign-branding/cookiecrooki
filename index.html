@@ -100,7 +100,9 @@ header.solid .burger span{background:var(--red)}
 .hero{
   background:radial-gradient(circle at 50% 15%, var(--cream) 0%, var(--cream-deep) 100%);
   padding:70px 0 90px;text-align:center;overflow:hidden;position:relative;
-  min-height:min(760px,86vh);display:flex;align-items:center;justify-content:center;
+  min-height:100vh;      /* tela cheia */
+  min-height:100svh;     /* no celular, desconta a barra do navegador */
+  display:flex;align-items:center;justify-content:center;
 }
 .hero-videos{position:absolute;inset:0;z-index:0;overflow:hidden;opacity:0;transition:opacity .8s ease}
 .hero-videos video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}
@@ -323,7 +325,7 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       </div>
     </div>
     <div class="sobre-photo">
-      <img src="img/fundadora.jpg" alt="Fundadora do Cookie Crooki com o forno">
+      <img src="img/fundadora.jpg?v=3" alt="Fundadora do Cookie Crooki com o forno">
       <span class="cap">Feito à mão, fornada por fornada 🍪</span>
     </div>
   </div>
@@ -351,11 +353,11 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       <p class="lead" style="margin:0 auto">Fotos de verdade, feitas por nós. Sem filtro, só cookie de qualidade.</p>
     </div>
     <div class="gallery-grid">
-      <a class="wide" href="img/forno.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/forno.jpg" alt="Cookies assando no forno"></a>
-      <a href="img/corte/redvelvet.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/corte/redvelvet.jpg" alt="Red Velvet partido, com recheio de cream cheese"></a>
-      <a href="img/oreo.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/oreo.jpg" alt="Cookie de Oreo"></a>
-      <a href="img/variedade.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/variedade.jpg" alt="Variedade de sabores"></a>
-      <a href="img/caixa.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/caixa.jpg" alt="Caixa com quatro cookies"></a>
+      <a class="wide" href="img/forno.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/forno.jpg?v=3" alt="Cookies assando no forno"></a>
+      <a href="img/corte/redvelvet.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/corte/redvelvet.jpg?v=3" alt="Red Velvet partido, com recheio de cream cheese"></a>
+      <a href="img/oreo.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/oreo.jpg?v=3" alt="Cookie de Oreo"></a>
+      <a href="img/variedade.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/variedade.jpg?v=3" alt="Variedade de sabores"></a>
+      <a href="img/caixa.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/caixa.jpg?v=3" alt="Caixa com quatro cookies"></a>
     </div>
   </div>
 </section>
@@ -464,8 +466,8 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
     "img/hero/caixa.jpg"       // caixa pronta
   ];
   var heroClips = [
-    "https://videos.pexels.com/video-files/8477941/8477941-hd_1920_1080_24fps.mp4",  // 1º: close-up (zoom) — Pexels
-    "video/cookies-hero.mp4",                                                        // vídeo próprio (giro pelos cookies)
+    "video/cookies-hero.mp4",                                                        // 1º: vídeo próprio (local, sempre carrega)
+    "https://videos.pexels.com/video-files/8477941/8477941-hd_1920_1080_24fps.mp4",  // close-up (zoom) — Pexels
     "https://videos.pexels.com/video-files/8477934/8477934-hd_1920_1080_24fps.mp4",  // bandeja de cookies — Pexels
     "https://videos.pexels.com/video-files/8477932/8477932-hd_1920_1080_24fps.mp4"   // cookies com leite — Pexels
   ]; // Pexels: Los Muertos Crew (uso livre)
@@ -495,9 +497,10 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       return;
     }
 
-    /* ---- modo vídeo: cada clipe ~3s, troca por tempo, loop infinito ---- */
-    var started = false, idx = 0, timer = null;
+    /* ---- modo vídeo: cada clipe ~3s, loop infinito, pulando os que falharem ---- */
+    var started = false, idx = 0;
     var segMs = (typeof HERO_SEG_MS === 'number') ? HERO_SEG_MS : 3200;
+    var ok = [];   // índices dos clipes que realmente carregaram
     var vids = heroClips.map(function(src){
       var v = document.createElement('video');
       v.src = src; v.muted = true; v.defaultMuted = true; v.loop = true;
@@ -513,21 +516,29 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       try{ v.currentTime = 0; }catch(e){}
       var p = v.play(); if(p && p.catch){ p.catch(function(){}); }
     }
-    function startCycle(from){
-      if(started) return; started = true;
+    function next(){
+      if(!ok.length) return;
+      var pos = ok.indexOf(idx);
+      activate(ok[(pos + 1) % ok.length]);   // só passa por clipes válidos
+    }
+    function startCycle(){
+      if(started || !ok.length) return;
+      started = true;
       hero.classList.add('has-video');
       if(window.__updateHeader) window.__updateHeader();
-      activate(from);
-      timer = setInterval(function(){ activate((idx+1) % vids.length); }, segMs);
+      activate(ok[0]);
+      setInterval(next, segMs);
     }
-    // Começa sempre pelo 1º clipe (close-up). Se demorar, faz fallback.
-    vids[0].addEventListener('loadeddata', function(){ startCycle(0); });
-    setTimeout(function(){
-      if(started) return;
-      var r = 0;
-      for(var k=0;k<vids.length;k++){ if(vids[k].readyState>=2){ r=k; break; } }
-      startCycle(r);
-    }, 4000);
+    vids.forEach(function(v,i){
+      v.addEventListener('loadeddata', function(){
+        if(ok.indexOf(i) === -1){ ok.push(i); ok.sort(function(a,b){return a-b;}); }
+        startCycle();   // arranca assim que o primeiro clipe válido estiver pronto
+      });
+      v.addEventListener('error', function(){
+        var k = ok.indexOf(i); if(k > -1) ok.splice(k,1);   // clipe quebrado sai do rodízio
+        v.remove();
+      });
+    });
   })();
 
   /* Menu — sabores oficiais Cookie Crooki (fotos reais) */
@@ -539,6 +550,7 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
     {n:"Red Velvet", d:"Massa red velvet com um toque de cacau, pedaços de chocolate branco e recheado com brigadeiro de cream cheese.", p:"15,00", chip:"Queridinho",
       img:"img/redvelvet.jpg",   cut:"img/corte/redvelvet.jpg"}
   ];
+  var V = "?v=3"; // versão dos arquivos — evita o navegador usar imagens antigas do cache
   var grid = document.getElementById('menuGrid');
   flavors.forEach(function(f){
     var msg = "Olá! Quero pedir o cookie *"+f.n+"* (110g~120g · R$ "+f.p+"). 🍪";
@@ -547,8 +559,8 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
     card.href = waLink(msg); card.target = "_blank"; card.rel="noopener";
     card.innerHTML =
       '<div class="photo-wrap">'+
-        '<img class="photo" loading="lazy" src="'+f.img+'" alt="Cookie '+f.n+'">'+
-        (f.cut? '<img class="cut" loading="lazy" src="'+f.cut+'" alt="Cookie '+f.n+' partido ao meio">':'')+
+        '<img class="photo" loading="lazy" src="'+f.img+V+'" alt="Cookie '+f.n+'">'+
+        (f.cut? '<img class="cut" loading="lazy" src="'+f.cut+V+'" alt="Cookie '+f.n+' partido ao meio">':'')+
         (f.chip? '<span class="tagline-chip">'+f.chip+'</span>':'')+
         (f.cut? '<button class="peek" type="button" aria-label="Ver o recheio">Ver recheio</button>':'')+
       '</div>'+
