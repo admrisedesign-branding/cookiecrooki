@@ -323,7 +323,7 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       </div>
     </div>
     <div class="sobre-photo">
-      <img src="img/fundadora.jpg?v=3" alt="Fundadora do Cookie Crooki com o forno">
+      <img src="img/fundadora.jpg" alt="Fundadora do Cookie Crooki com o forno">
       <span class="cap">Feito à mão, fornada por fornada 🍪</span>
     </div>
   </div>
@@ -351,11 +351,11 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       <p class="lead" style="margin:0 auto">Fotos de verdade, feitas por nós. Sem filtro, só cookie de qualidade.</p>
     </div>
     <div class="gallery-grid">
-      <a class="wide" href="img/forno.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/forno.jpg?v=3" alt="Cookies assando no forno"></a>
-      <a href="img/corte/redvelvet.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/corte/redvelvet.jpg?v=3" alt="Red Velvet partido, com recheio de cream cheese"></a>
-      <a href="img/oreo.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/oreo.jpg?v=3" alt="Cookie de Oreo"></a>
-      <a href="img/variedade.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/variedade.jpg?v=3" alt="Variedade de sabores"></a>
-      <a href="img/caixa.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/caixa.jpg?v=3" alt="Caixa com quatro cookies"></a>
+      <a class="wide" href="img/forno.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/forno.jpg" alt="Cookies assando no forno"></a>
+      <a href="img/corte/redvelvet.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/corte/redvelvet.jpg" alt="Red Velvet partido, com recheio de cream cheese"></a>
+      <a href="img/oreo.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/oreo.jpg" alt="Cookie de Oreo"></a>
+      <a href="img/variedade.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/variedade.jpg" alt="Variedade de sabores"></a>
+      <a href="img/caixa.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/caixa.jpg" alt="Caixa com quatro cookies"></a>
     </div>
   </div>
 </section>
@@ -539,7 +539,6 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
     {n:"Red Velvet", d:"Massa red velvet com um toque de cacau, pedaços de chocolate branco e recheado com brigadeiro de cream cheese.", p:"15,00", chip:"Queridinho",
       img:"img/redvelvet.jpg",   cut:"img/corte/redvelvet.jpg"}
   ];
-  var V = "?v=3"; // versão dos arquivos — evita o navegador usar imagens antigas do cache
   var grid = document.getElementById('menuGrid');
   flavors.forEach(function(f){
     var msg = "Olá! Quero pedir o cookie *"+f.n+"* (110g~120g · R$ "+f.p+"). 🍪";
@@ -548,8 +547,8 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
     card.href = waLink(msg); card.target = "_blank"; card.rel="noopener";
     card.innerHTML =
       '<div class="photo-wrap">'+
-        '<img class="photo" loading="lazy" src="'+f.img+V+'" alt="Cookie '+f.n+'">'+
-        (f.cut? '<img class="cut" loading="lazy" src="'+f.cut+V+'" alt="Cookie '+f.n+' partido ao meio">':'')+
+        '<img class="photo" loading="lazy" src="'+f.img+'" alt="Cookie '+f.n+'">'+
+        (f.cut? '<img class="cut" loading="lazy" src="'+f.cut+'" alt="Cookie '+f.n+' partido ao meio">':'')+
         (f.chip? '<span class="tagline-chip">'+f.chip+'</span>':'')+
         (f.cut? '<button class="peek" type="button" aria-label="Ver o recheio">Ver recheio</button>':'')+
       '</div>'+
