@@ -166,8 +166,24 @@ header.solid .burger span{background:var(--red)}
 }
 .card:hover{transform:translateY(-4px);box-shadow:0 12px 0 var(--cream-deep)}
 .photo-wrap{position:relative;aspect-ratio:1/1;overflow:hidden;background:var(--cream-deep)}
-.photo-wrap .photo{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
+.photo-wrap .photo{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease, opacity .45s ease}
 .card:hover .photo-wrap .photo{transform:scale(1.05)}
+/* foto do cookie partido — aparece no hover (ou ao tocar em "ver recheio") */
+.photo-wrap .cut{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+  opacity:0;transform:scale(1.08);transition:opacity .45s ease, transform .5s ease;
+}
+.card:hover .photo-wrap .cut,
+.photo-wrap.show-cut .cut{opacity:1;transform:scale(1)}
+.card:hover .photo-wrap.has-cut .photo,
+.photo-wrap.show-cut .photo{opacity:0}
+.peek{
+  position:absolute;right:12px;bottom:12px;z-index:3;
+  background:rgba(59,26,16,.72);color:var(--cream-soft);border:none;cursor:pointer;
+  font-family:'Nunito';font-weight:800;font-size:12px;padding:7px 12px;border-radius:20px;
+  backdrop-filter:blur(3px);transition:background .2s, transform .2s;
+}
+.peek:hover{background:var(--red);transform:translateY(-1px)}
 .tagline-chip{position:absolute;top:14px;left:14px;background:var(--red);color:var(--cream);
   font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;letter-spacing:.5px;
   text-transform:uppercase;box-shadow:0 3px 0 var(--red-deep)}
@@ -307,7 +323,7 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       </div>
     </div>
     <div class="sobre-photo">
-      <img src="img/fundadora.jpg" alt="Fundadora do Cookie Crooki com o forno">
+      <img src="img/fundadora.jpg?v=3" alt="Fundadora do Cookie Crooki com o forno">
       <span class="cap">Feito à mão, fornada por fornada 🍪</span>
     </div>
   </div>
@@ -335,11 +351,11 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
       <p class="lead" style="margin:0 auto">Fotos de verdade, feitas por nós. Sem filtro, só cookie de qualidade.</p>
     </div>
     <div class="gallery-grid">
-      <a class="wide" href="img/forno.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/forno.jpg" alt="Cookies assando no forno"></a>
-      <a href="img/redvelvet.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/redvelvet.jpg" alt="Red Velvet recheado"></a>
-      <a href="img/oreo.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/oreo.jpg" alt="Cookie de Oreo"></a>
-      <a href="img/variedade.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/variedade.jpg" alt="Variedade de sabores"></a>
-      <a href="img/caixa.jpg" target="_blank" rel="noopener"><img loading="lazy" src="img/caixa.jpg" alt="Caixa com quatro cookies"></a>
+      <a class="wide" href="img/forno.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/forno.jpg?v=3" alt="Cookies assando no forno"></a>
+      <a href="img/corte/redvelvet.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/corte/redvelvet.jpg?v=3" alt="Red Velvet partido, com recheio de cream cheese"></a>
+      <a href="img/oreo.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/oreo.jpg?v=3" alt="Cookie de Oreo"></a>
+      <a href="img/variedade.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/variedade.jpg?v=3" alt="Variedade de sabores"></a>
+      <a href="img/caixa.jpg?v=3" target="_blank" rel="noopener"><img loading="lazy" src="img/caixa.jpg?v=3" alt="Caixa com quatro cookies"></a>
     </div>
   </div>
 </section>
@@ -516,10 +532,14 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
 
   /* Menu — sabores oficiais Cookie Crooki (fotos reais) */
   var flavors = [
-    {n:"All Black", d:"Massa de cacau black com pedaços de chocolate meio amargo nobre e recheado com chocolate nobre 40%.", p:"16,50", chip:"Mais nobre", img:"img/allblack.jpg"},
-    {n:"Tradicional", d:"Massa de baunilha com pedaços de chocolate ao leite e recheado com Nutella.", p:"15,00", chip:"Mais pedido", img:"img/tradicional.jpg"},
-    {n:"Red Velvet", d:"Massa red velvet com um toque de cacau, pedaços de chocolate branco e recheado com brigadeiro de cream cheese.", p:"15,00", chip:"Queridinho", img:"img/redvelvet.jpg"}
+    {n:"All Black", d:"Massa de cacau black com pedaços de chocolate meio amargo nobre e recheado com chocolate nobre 40%.", p:"16,50", chip:"Mais nobre",
+      img:"img/allblack.jpg",   cut:"img/corte/allblack.jpg"},
+    {n:"Tradicional", d:"Massa de baunilha com pedaços de chocolate ao leite e recheado com Nutella.", p:"15,00", chip:"Mais pedido",
+      img:"img/tradicional.jpg", cut:"img/corte/tradicional.jpg"},
+    {n:"Red Velvet", d:"Massa red velvet com um toque de cacau, pedaços de chocolate branco e recheado com brigadeiro de cream cheese.", p:"15,00", chip:"Queridinho",
+      img:"img/redvelvet.jpg",   cut:"img/corte/redvelvet.jpg"}
   ];
+  var V = "?v=3"; // versão dos arquivos — evita o navegador usar imagens antigas do cache
   var grid = document.getElementById('menuGrid');
   flavors.forEach(function(f){
     var msg = "Olá! Quero pedir o cookie *"+f.n+"* (110g~120g · R$ "+f.p+"). 🍪";
@@ -528,8 +548,10 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
     card.href = waLink(msg); card.target = "_blank"; card.rel="noopener";
     card.innerHTML =
       '<div class="photo-wrap">'+
-        '<img class="photo" loading="lazy" src="'+f.img+'" alt="Cookie '+f.n+'">'+
+        '<img class="photo" loading="lazy" src="'+f.img+V+'" alt="Cookie '+f.n+'">'+
+        (f.cut? '<img class="cut" loading="lazy" src="'+f.cut+V+'" alt="Cookie '+f.n+' partido ao meio">':'')+
         (f.chip? '<span class="tagline-chip">'+f.chip+'</span>':'')+
+        (f.cut? '<button class="peek" type="button" aria-label="Ver o recheio">Ver recheio</button>':'')+
       '</div>'+
       '<div class="card-body">'+
         '<h3>'+f.n+'</h3>'+
@@ -537,6 +559,26 @@ footer small{opacity:.6;display:block;margin-top:16px;font-size:13px}
         '<div class="price"><b>R$ '+f.p+'</b><span class="add">Pedir ›</span></div>'+
       '</div>';
     grid.appendChild(card);
+
+    // Só ativa a troca se a foto do corte existir de fato
+    var wrap = card.querySelector('.photo-wrap');
+    var cutImg = card.querySelector('.cut');
+    if(cutImg){
+      cutImg.addEventListener('load', function(){ wrap.classList.add('has-cut'); });
+      cutImg.addEventListener('error', function(){
+        cutImg.remove();
+        var b = card.querySelector('.peek'); if(b) b.remove();
+      });
+    }
+    // Botão "ver recheio" (celular, onde não existe hover) — não abre o WhatsApp
+    var peek = card.querySelector('.peek');
+    if(peek){
+      peek.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        wrap.classList.toggle('show-cut');
+        peek.textContent = wrap.classList.contains('show-cut') ? 'Ver inteiro' : 'Ver recheio';
+      });
+    }
   });
 
   /* Wire all WhatsApp buttons */
